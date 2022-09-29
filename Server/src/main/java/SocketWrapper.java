@@ -7,11 +7,13 @@ public class SocketWrapper{
     Socket socket;
     ObjectInputStream ois;
     ObjectOutputStream oos;
+    String color;
 
-    public SocketWrapper(Socket socket) throws IOException {
+    public SocketWrapper(Socket socket, String color) throws IOException {
         this.socket = socket;
         ois = new ObjectInputStream(socket.getInputStream());
         oos = new ObjectOutputStream(socket.getOutputStream());
+        this.color = color;
     }
 
     public Socket getSocket() {
@@ -37,4 +39,13 @@ public class SocketWrapper{
     public void setOos(ObjectOutputStream oos) {
         this.oos = oos;
     }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
 }

@@ -1,12 +1,13 @@
 package chat;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Message implements Serializable {
-    @Serial
+
     private static final long serialVersionUID = 1L;
+    private static final String ANSI_RESET = "\u001B[0m";
+
     private String message;
     private String sender;
     private LocalDateTime dateTime;
@@ -41,9 +42,17 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
+        return "Message{" +
+                "message='" + message + '\'' +
+                ", sender='" + sender + '\'' +
+                ", dateTime=" + dateTime +
+                '}';
+    }
+
+    public String formatted(){
         return dateTime.format(
                 java.time.format.DateTimeFormatter.ofPattern("MM-dd HH:mm"))
-                + " " + sender + ": " + message;
+                + " " + sender + ANSI_RESET + ": " + message;
     }
 }
 
