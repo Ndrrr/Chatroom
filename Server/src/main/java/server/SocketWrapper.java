@@ -1,19 +1,20 @@
+package server;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class SocketWrapper{
-    Socket socket;
-    ObjectInputStream ois;
-    ObjectOutputStream oos;
-    String color;
+    private Socket socket;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
+    private String color;
 
-    public SocketWrapper(Socket socket, String color) throws IOException {
+    public SocketWrapper(Socket socket) throws IOException {
         this.socket = socket;
         ois = new ObjectInputStream(socket.getInputStream());
         oos = new ObjectOutputStream(socket.getOutputStream());
-        this.color = color;
     }
 
     public Socket getSocket() {
@@ -40,12 +41,11 @@ public class SocketWrapper{
         this.oos = oos;
     }
 
-    public String getColor() {
-        return color;
+    public void closeSocket(){
+        try{
+            socket.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
 }
