@@ -1,4 +1,4 @@
-import client.Client;
+import chatroom.client.Client;
 
 import java.io.IOException;
 

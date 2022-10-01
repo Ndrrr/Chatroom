@@ -1,24 +1,22 @@
-package server;
+package chatroom.server;
 
-import chat.Message;
-import chat.Security;
+import chatroom.Message;
+import chatroom.Node;
 
+import javax.crypto.KeyAgreement;
 import java.io.*;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.security.PublicKey;
+import java.util.*;
 
-public class Server {
+public class TcpServer extends Node {
     private int colorIndex = 0;
     private final int port = 9876;
     private final List<Message> messageList = new ArrayList<>();
     private volatile static int messageCounter = 0;
-
     private Set<SocketWrapper> sockets = new HashSet<>();
     public void run() throws IOException{
-        System.out.println(Security.secretKey);
+
         ServerSocket server = new ServerSocket(port);
         System.out.println("server.Server is listening on port " + port);
 
@@ -26,9 +24,19 @@ public class Server {
             try {
                 SocketWrapper socket = new SocketWrapper(server.accept());
                 sockets.add(socket);
+
                 System.out.println("New client connected");
+                // creating new thread for each client
                 Thread clientThread = new Thread(()->{
                     try {
+                        ObjectOutputStream oos = socket.getOos();
+                        ObjectInputStream ois = socket.getOis();
+
+                        // creating shared secret for client
+                        KeyAgreement keyAgreement = this.makeKeyExchangeParams();
+                        oos.writeObject(this.getPublicKey());
+                        socket.setSharedSecret(this.getSharedSecret((PublicKey)ois.readObject(), keyAgreement));
+
                         handleSocket(socket, colorIndex++);
                     } catch (IOException | ClassNotFoundException e) {
                         throw new RuntimeException(e);
@@ -52,16 +60,17 @@ public class Server {
             ObjectInputStream ois = socket.getOis();
 
             try {
-                Message message = (Message) ois.readObject();
+                Message message = this.decryptMessage((Message) ois.readObject(), socket.getSharedSecret());
                 message.setColor(colorIndex);
+
                 if (message.getMessage().equalsIgnoreCase(".exit")) {
                     socket.getSocket().close();
                     break;
                 }
                 message.setId(messageCounter++);
                 messageList.add(message);
-                sendMessages();
                 System.out.println(message.formatted());
+                sendMessages();
             }catch(Exception e){
                 // e.printStackTrace();
                 System.out.println("Connection lost with one client");
@@ -74,22 +83,27 @@ public class Server {
 
     }
     private void sendMessages(){
-       sockets.removeIf(socketWrapper -> socketWrapper.getSocket().isClosed());
-       sockets.forEach((socketWrapper) ->{
+        // remove closed sockets
+        sockets.removeIf(socketWrapper -> socketWrapper.getSocket().isClosed());
 
+        sockets.forEach((socketWrapper) ->{
         ObjectOutputStream oos = socketWrapper.getOos();
         try {
             messageList.forEach((message -> {
                 try {
-                    if(socketWrapper.getSocket().isConnected())
-                        oos.writeObject(message);
+                    // socket may be deleted in other thread until getting here from previous check
+                    // so checking again
+                    if(socketWrapper.getSocket().isConnected()) {
+                        oos.writeObject(this.encryptMessage(message, socketWrapper.getSharedSecret()));
+                    }
                 } catch (IOException e) {
                     socketWrapper.closeSocket();
                     e.printStackTrace();
                 }
             }));
-            if(socketWrapper.getSocket().isConnected())
-                oos.writeObject(Message.END);
+            if(socketWrapper.getSocket().isConnected()) {
+                oos.writeObject(this.encryptMessage(Message.END, socketWrapper.getSharedSecret()));
+            }
         } catch (IOException e) {
             socketWrapper.closeSocket();
             e.printStackTrace();

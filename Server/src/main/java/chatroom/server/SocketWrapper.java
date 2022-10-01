@@ -1,15 +1,16 @@
-package server;
+package chatroom.server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.PublicKey;
 
 public class SocketWrapper{
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    private String color;
+    private byte[] sharedSecret;
 
     public SocketWrapper(Socket socket) throws IOException {
         this.socket = socket;
@@ -39,6 +40,14 @@ public class SocketWrapper{
 
     public void setOos(ObjectOutputStream oos) {
         this.oos = oos;
+    }
+
+    public byte[] getSharedSecret() {
+        return sharedSecret;
+    }
+
+    public void setSharedSecret(byte[] sharedSecret) {
+        this.sharedSecret = sharedSecret;
     }
 
     public void closeSocket(){

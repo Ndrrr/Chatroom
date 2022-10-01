@@ -1,4 +1,4 @@
-package chat;
+package chatroom;
 
 public enum ANSI {
     RESET_FORMAT("\u001B[0m"), RESET_CONSOLE("\033[H\033[2J"), BOLD("\033[0;1m");

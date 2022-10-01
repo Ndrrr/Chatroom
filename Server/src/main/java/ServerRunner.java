@@ -1,10 +1,10 @@
-import server.Server;
+import chatroom.server.TcpServer;
 
 import java.io.IOException;
 
 public class ServerRunner {
     public static void main(String[] args) throws IOException {
-        Server server = new Server();
+        TcpServer server = new TcpServer();
         server.run();
     }
 }

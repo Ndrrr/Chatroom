@@ -1,4 +1,4 @@
-package chat;
+package chatroom;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -6,27 +6,28 @@ import java.util.Arrays;
 import java.util.Objects;
 import javax.crypto.*;
 
-public class Message implements Serializable, Comparable<Message>{
+public class Message implements Serializable, Comparable<Message>, Cloneable{
 
     private static final long serialVersionUID = 1L;
-    public static Message START= new Message(-1,"start");
-    public static Message END = new Message(-2, "end");
+    public static Message START= new Message(-1,"start", "START");
+    public static Message END = new Message(-2, "end", "END");
     public static final Object[] colors = Arrays.stream(ANSI.Colors.values()).map(ANSI.Colors::getValue).toArray();
     private int id;
     private String message;
     private String sender;
     private LocalDateTime dateTime;
     private int color;
-    private SealedObject encryptedMessage;
     public Message(){}
     public Message(int id, String message){
         this.id = id;
         this.message = message;
     }
-    public Message(int id, String message, String sender, LocalDateTime dateTime){
-        this.id = id;
-        this.message = message;
+    public Message(int id, String message, String sender){
+        this(id,message);
         this.sender = sender;
+    }
+    public Message(int id, String message, String sender, LocalDateTime dateTime){
+        this(id, message, sender);
         this.dateTime = dateTime;
     }
     public String getMessage(){
@@ -66,14 +67,6 @@ public class Message implements Serializable, Comparable<Message>{
         this.dateTime = dateTime;
     }
 
-    public SealedObject getEncryptedMessage() {
-        return encryptedMessage;
-    }
-
-    public void setEncryptedMessage(SealedObject encryptedMessage) {
-        this.encryptedMessage = encryptedMessage;
-    }
-
     @Override
     public String toString() {
         return "Message{" +
@@ -104,6 +97,17 @@ public class Message implements Serializable, Comparable<Message>{
     @Override
     public int compareTo(Message o) {
         return dateTime.compareTo(o.getDateTime());
+    }
+
+    @Override
+    public Message clone(){
+        Message msg = new Message();
+        msg.setId(this.id);
+        msg.setColor(this.color);
+        msg.setSender(this.sender);
+        msg.setMessage(this.message);
+        msg.setDateTime(this.dateTime);
+        return msg;
     }
 }
 
