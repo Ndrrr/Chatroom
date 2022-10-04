@@ -1,5 +1,6 @@
 package chatroom.server;
 
+import chatroom.ANSI;
 import chatroom.Message;
 import chatroom.Node;
 
@@ -62,12 +63,11 @@ public class TcpServer extends Node {
             try {
                 Message message = this.decryptMessage((Message) ois.readObject(), socket.getSharedSecret());
                 message.setColor(colorIndex);
-
-                if (message.getMessage().equalsIgnoreCase(".exit")) {
-                    socket.getSocket().close();
-                    break;
-                }
                 message.setId(messageCounter++);
+                if (message.getMessage().equalsIgnoreCase(".exit")) {
+                    message.setMessage(ANSI.BOLD.getValue() +"LEFT CHAT" + ANSI.RESET_FORMAT.getValue());
+                    socket.closeSocket();
+                }
                 messageList.add(message);
                 System.out.println(message.formatted());
                 sendMessages();

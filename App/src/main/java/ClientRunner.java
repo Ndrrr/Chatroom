@@ -1,10 +1,10 @@
-import chatroom.client.Client;
+import chatroom.client.TcpClient;
 
 import java.io.IOException;
 
 public class ClientRunner {
     public static void main(String[] args) throws IOException, InterruptedException {
-        Client client = new Client();
+        TcpClient client = new TcpClient();
         client.run();
     }
 }

@@ -12,7 +12,7 @@ import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class Client extends Node {
+public class TcpClient extends Node {
 
     public void run() throws IOException, InterruptedException {
         Scanner sc = new Scanner(System.in);
