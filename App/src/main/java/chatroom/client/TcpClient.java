@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class TcpClient extends Node {
+    private final int server_port = 9876;
 
     public void run() throws IOException, InterruptedException {
         Scanner sc = new Scanner(System.in);
@@ -20,11 +21,12 @@ public class TcpClient extends Node {
         String username = sc.nextLine();
 
         // initializing server data
-        //  System.out.print("Enter server ip: ");
-        //  String ip = sc.nextLine();
+        System.out.print("Enter server ip: ");
+        String ip = sc.nextLine();
 
-        InetAddress host = InetAddress.getLocalHost();
-        Socket socket = new Socket(host.getHostName(), 9876);
+        InetAddress host = InetAddress.getByName(ip);
+        // InetAddress host = InetAddress.getLocalHost();
+        Socket socket = new Socket(host.getHostName(), server_port);
 
 
         ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
